@@ -90,7 +90,9 @@ public class Server {
                         endTime = LocalDateTime.now();
                         ToClient.writeBytes("Ending connection...\n");
                         printInfo();
+                        ToClient.flush();
                         aliveConnections--;
+                        socket.close();
                     }else{
                         // else, it should be an expression to be calculated.
                         Double result = Double.parseDouble(calculator(inputFromClient));
@@ -105,7 +107,12 @@ public class Server {
                     }
                     ToClient.flush();
                 }
-            }catch(Exception e){
+            }
+            catch (SocketException se){
+                System.out.println(clientUserName + " thread terminated\n");
+            }
+            catch(Exception e){
+                
                 e.printStackTrace();
             }
 
