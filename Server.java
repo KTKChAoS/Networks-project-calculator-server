@@ -15,10 +15,10 @@ public class Server {
         startServer();    
     }
 
-    // creates log file and starts the server on the specified port number
+    // creates a new log file every time the server is started and starts the server on the specified port number
     private void startServer(){
         try {
-            File file = new File("logfile.txt");
+            File file = new File("./logfile " + LocalDateTime.now().toString().replace(':', '-') + ".txt");
             //Instantiating the PrintStream class
             PrintStream stream = new PrintStream(file);
             System.setOut(stream);
@@ -38,7 +38,7 @@ public class Server {
 
     public static void main(String[] args) {
         if(args.length == 0){
-            // if the use doesn not specify a port number, it is defaulted to 5000
+            // if the user does not specify a port number, it is defaulted to 5000
             new Server("5000");
         }
         new Server(args[0]);
@@ -64,9 +64,11 @@ public class Server {
         @Override
         public void run() {
             try{
+                // starting I/O streams to transfer data between the client and server
                 FromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 ToClient = new DataOutputStream(socket.getOutputStream());
 
+                // wait for client to send a string
                 while(true){
                     String inputFromClient = FromClient.readLine();
                     if(inputFromClient == null) continue;
@@ -76,17 +78,21 @@ public class Server {
                         System.out.println("Message from client " + clientUserName + " (" + hostName + "): " + inputFromClient);
                     }
 
+                    // if this is to start the connection
                     if(inputFromClient.contains("starting connection")){
+                        // sets the client name, start time and increments the number of active connections
                         clientUserName = inputFromClient.split(" ")[0];
                         startTime = LocalDateTime.now();
                         ToClient.writeBytes("Connection established\n");
                         aliveConnections++;
                     }else if(inputFromClient.equals("quit")){
+                        // set the end time, log the client information and decrement the number of active connections
                         endTime = LocalDateTime.now();
                         ToClient.writeBytes("Ending connection...\n");
                         printInfo();
                         aliveConnections--;
                     }else{
+                        // else, it should be an expression to be calculated.
                         Double result = Double.parseDouble(calculator(inputFromClient));
                         System.out.println("Sending " + clientUserName + " answer: " + result);
                         if(result.equals(Double.NaN)){
@@ -94,6 +100,7 @@ public class Server {
                         }else{
                             ToClient.writeBytes(result +"\n");
                         }     
+                        // add the requested expression to the array for logging
                         equationList.add(inputFromClient);
                     }
                     ToClient.flush();
@@ -104,6 +111,7 @@ public class Server {
 
         }
 
+        // we used a script Nashorn to evaluate the expressions
         private String calculator(String expression){
             Object expResult1 = Double.NaN;
             try {
@@ -118,6 +126,7 @@ public class Server {
             return expResult1.toString();
         }
 
+        // whenever a client diconnects, their info is logged into the logfile.
         private void printInfo(){
             System.out.println("\n\tClient disconnected. Information:\n");
             System.out.println("Client: " + hostName);

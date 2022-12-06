@@ -20,7 +20,6 @@ public class Client {
             userName = "anonymous";
             serverAddress = "localhost";
             portNumber = 5000;
-            // return;
         } else {
             userName = args[0];
             serverAddress = args[1];
@@ -31,28 +30,34 @@ public class Client {
 
     private void startClient() {
         try {
+            // create new socket, and new I/O streams for connecting to the server and communicating
             socket = new Socket(serverAddress, portNumber);
             FromUser = new BufferedReader(new InputStreamReader(System.in));
             ToServer = new DataOutputStream(socket.getOutputStream());
             FromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+            // done to pass the username to the server
             ToServer.writeBytes(userName + " starting connection\n");
             ToServer.flush();
 
             System.out.println(FromServer.readLine());
 
+            // wait for user to type an expression and then send it to the server
             while (true) {
-                System.out.print("Enter equation(type 'quit' to close connection): ");
+                System.out.print("Enter expression (type 'quit' to close connection): ");
                 String input = FromUser.readLine();
                 ToServer.writeBytes(input + "\n");
 
+                // read the output from the server and display it
                 String fromServer = FromServer.readLine();
                 System.out.println("Result from server: " + fromServer);
 
+                // if the server is ending connection, break out of the while loop
                 if (fromServer.equals("Ending connection...")) {
                     break;
                 }
             }
+            // close the socket at the end
             socket.close();
         } catch (Exception e) {
             e.printStackTrace();
