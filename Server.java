@@ -27,6 +27,7 @@ public class Server {
         }
         try{
             serverSocket = new ServerSocket(portNumber);
+            System.out.println(LocalDateTime.now().toString() + ": Server started at port " + portNumber);
             // listens on the port and creates a new connection every time a new client requests for a connection
             while(true){
                 connections.add(new ConnectionInfo(serverSocket.accept()));
