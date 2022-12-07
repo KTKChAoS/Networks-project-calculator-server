@@ -57,7 +57,7 @@ public class Server {
         ConnectionInfo(Socket socket){
             this.socket = socket;
             hostName = socket.getInetAddress().getHostName();
-            System.out.println("New connection started with " + hostName);
+            System.out.println(LocalDateTime.now().toString() + ": New connection started with " + hostName);
             this.start();
         }
 
@@ -73,9 +73,9 @@ public class Server {
                     String inputFromClient = FromClient.readLine();
                     if(inputFromClient == null) continue;
                     if(clientUserName == null){
-                        System.out.println("Message from client " + hostName + ": " + inputFromClient);
+                        System.out.println(LocalDateTime.now().toString() + ": Message from client " + hostName + ": " + inputFromClient);
                     }else{
-                        System.out.println("Message from client " + clientUserName + " (" + hostName + "): " + inputFromClient);
+                        System.out.println(LocalDateTime.now().toString() + ": Message from client " + clientUserName + " (" + hostName + "): " + inputFromClient);
                     }
 
                     // if this is to start the connection
@@ -96,7 +96,7 @@ public class Server {
                     }else{
                         // else, it should be an expression to be calculated.
                         Double result = Double.parseDouble(calculator(inputFromClient));
-                        System.out.println("Sending " + clientUserName + " answer: " + result);
+                        System.out.println(LocalDateTime.now().toString() + ": Sending " + clientUserName + " answer: " + result);
                         if(result.equals(Double.NaN)){
                             ToClient.writeBytes("Expression format could not be resolved. Refer to documentation\n");
                         }else{
@@ -109,7 +109,7 @@ public class Server {
                 }
             }
             catch (SocketException se){
-                System.out.println(clientUserName + " thread terminated\n");
+                System.out.println(LocalDateTime.now().toString() + ": " + clientUserName + " thread terminated\n");
             }
             catch(Exception e){
                 
@@ -125,9 +125,9 @@ public class Server {
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("Nashorn");
                 expResult1 = scriptEngine.eval(expression);
-                System.out.println(expResult1.toString());
+                System.out.println(LocalDateTime.now().toString() + ": result: " + expResult1.toString());
             } catch (Exception e) {
-                System.out.println("c" + expResult1.toString());
+                System.out.println(LocalDateTime.now().toString() + ": " + "error: " + expResult1.toString());
 
             }
             return expResult1.toString();
@@ -135,7 +135,7 @@ public class Server {
 
         // whenever a client diconnects, their info is logged into the logfile.
         private void printInfo(){
-            System.out.println("\n\tClient disconnected. Information:\n");
+            System.out.println(LocalDateTime.now().toString() + ": " + "\n\tClient disconnected. Information:\n");
             System.out.println("Client: " + hostName);
             System.out.println("User name: " + clientUserName);
             System.out.println("Connection started: " + startTime);
